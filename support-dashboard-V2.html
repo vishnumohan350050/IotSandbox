@@ -96,6 +96,14 @@ label{font-size:12px;color:var(--sub);font-weight:600;display:block;margin-botto
   .modal{max-width:100%}
   button{padding:8px 12px}
 }
+
+.tracker{display:flex;gap:10px;margin-top:8px}
+.step{flex:1;border:1px solid var(--line);border-radius:10px;padding:10px;display:flex;flex-direction:column;gap:2px;background:#fff}
+.step .dot{width:22px;height:22px;border-radius:50%;background:#e8eef8;color:var(--sub);display:grid;place-items:center;font-size:12px;font-weight:700;margin-bottom:4px}
+.step.done{border-color:var(--navy);background:#f5f9ff}.step.done .dot{background:var(--navy);color:#fff}
+.step.bad{border-color:var(--red);background:#fff5f5}.step.bad .dot{background:var(--red)}
+.step small{color:var(--sub);font-size:11.5px;line-height:1.35}
+@media (max-width:640px){.tracker{flex-direction:column}}
 </style>
 </head>
 <body>
@@ -154,6 +162,7 @@ let memberStatusFilter = null;
 let memberCatFilter = '';
 let memberSearch = '';
 let openTicketId = null;
+let adminStatusFilter = null, adminCatFilter = '', adminSearch = '';
 
 const $ = s => document.querySelector(s);
 const app = $('#app');
@@ -181,8 +190,29 @@ function render(){
   wireEvents();
 }
 
+
+const handledBy = t => { const l=[...t.log].reverse().find(x=>x.action!=='Ticket Raised'); return l?l.actor:'—'; };
+const actorName = () => role==='admin' ? 'Super Admin' : memberName(loggedInMemberId);
+function statCards(list, current){
+  const c = {Open:0,'In Progress':0,Approved:0,Rejected:0};
+  list.forEach(t=>c[t.status]++);
+  return `<div class="stats">${['Open','In Progress','Approved','Rejected'].map(x=>`<div class="stat ${current===x?'on':''}" data-statfilter="${x}"><b>${c[x]}</b><span>${x}</span></div>`).join('')}</div>`;
+}
+function progressTracker(t){
+  const got = a => t.log.find(l=>l.action===a);
+  const raised = got('Ticket Raised'), prog = got('Marked In Progress'), fin = got('Approved')||got('Rejected');
+  const rej = t.status==='Rejected';
+  const steps = [
+    {n:'Raised', d:raised, on:true},
+    {n:'In Progress', d:prog, on:!!prog, skipped:!prog && !!fin},
+    {n:fin?fin.action:'Approved / Rejected', d:fin, on:!!fin, bad:rej}
+  ];
+  return `<div class="tracker">${steps.map((p,i)=>`<div class="step ${p.on?'done':''} ${p.bad?'bad':''} ${p.skipped?'skip':''}"><span class="dot">${p.on?(p.bad?'✕':'✓'):i+1}</span><b>${p.n}</b><small>${p.d?p.d.actor+'<br>'+p.d.at:(p.skipped?'Skipped (direct resolution)':'Pending')}</small></div>`).join('')}</div>`;
+}
+
 // ---------- Super Admin ----------
 function adminView(){
+  if(openTicketId) return ticketDetailScreen(openTicketId, true);
   return `
   <div class="tabs">
     <button class="tab ${adminTab==='categories'?'active':''}" data-tab="categories">Service Categories</button>
@@ -242,7 +272,17 @@ function teamPanel(){
 }
 
 function allTicketsPanel(){
-  return `<div class="card"><h2>All Tickets</h2>${ticketTable(tickets, true)}</div>`;
+  let list = tickets;
+  const base = tickets;
+  if(adminStatusFilter) list = list.filter(t=>t.status===adminStatusFilter);
+  if(adminCatFilter) list = list.filter(t=>t.categoryId===adminCatFilter);
+  if(adminSearch.trim()){ const q=adminSearch.trim().toLowerCase(); list = list.filter(t=>t.ticketNo.toLowerCase().includes(q)||t.client.toLowerCase().includes(q)||t.device.toLowerCase().includes(q)); }
+  return statCards(base, adminStatusFilter) + `<div class="card"><h2>All Tickets</h2>
+    <div class="row" style="margin-bottom:12px">
+      <input style="max-width:220px" placeholder="Search ticket/client/device" id="adminSearchInput" value="${adminSearch}">
+      <select id="adminCatSelect" style="max-width:240px"><option value="">All categories</option>${categories.map(c=>`<option value="${c.id}" ${adminCatFilter===c.id?'selected':''}>${c.name}</option>`).join('')}</select>
+      ${adminStatusFilter?`<button class="ghost" id="clearStatFilter">Clear status: ${adminStatusFilter} ✕</button>`:''}
+    </div>${ticketTable(list, true)}</div>`;
 }
 
 function ticketTable(list, showCategory){
@@ -253,8 +293,9 @@ function ticketTable(list, showCategory){
     <td>${t.client}</td><td>${t.device}</td>
     <td class="muted">${t.raisedOn}</td>
     <td><span class="badge ${badgeCls(t.status)}">${t.status}</span></td>
+    <td class="muted">${handledBy(t)}</td>
   </tr>`).join('');
-  return `<div class="tblwrap"><table><thead><tr><th>Ticket No.</th>${showCategory?'<th>Category</th>':''}<th>Client</th><th>Device</th><th>Raised On</th><th>Status</th></tr></thead>
+  return `<div class="tblwrap"><table><thead><tr><th>Ticket No.</th>${showCategory?'<th>Category</th>':''}<th>Client</th><th>Device</th><th>Raised On</th><th>Status</th><th>Handled by</th></tr></thead>
   <tbody>${rows}</tbody></table></div>`;
 }
 
@@ -329,6 +370,8 @@ function ticketDetailScreen(id, isMember){
       <div><label>Resolved At</label><div>${t.resolvedAt||'—'}</div></div>
     </div>
     <div class="field"><label>Description / Request</label><div>${t.description}</div></div>
+    <div class="field"><label>Handled by</label><div>${handledBy(t)}</div></div>
+    <label>Progress</label>${progressTracker(t)}
     ${t.remarks?`<div class="field"><label>Remarks</label><div>${t.remarks}</div></div>`:''}
   </div>
   <div class="card">
@@ -341,7 +384,7 @@ function ticketDetailScreen(id, isMember){
 function addLog(t, action, actor, remarks){ t.log.push({action, actor, remarks:remarks||null, at:new Date().toISOString().slice(0,16).replace('T',' ')}); }
 
 function wireEvents(){
-  app.querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>{adminTab=b.dataset.tab; render();});
+  app.querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>{adminTab=b.dataset.tab; openTicketId=null; render();});
   app.querySelectorAll('[data-openticket]').forEach(b=>b.onclick=()=>{openTicketId=b.dataset.openticket; render();});
   const back = $('#backBtn'); if(back) back.onclick=()=>{openTicketId=null; render();};
 
@@ -422,20 +465,22 @@ function wireEvents(){
   // dashboard filters
   const statTiles = app.querySelectorAll('[data-statfilter]');
   statTiles.forEach(s=>s.onclick=()=>{
-    const v=s.dataset.statfilter; memberStatusFilter = memberStatusFilter===v?null:v; render();
+    const v=s.dataset.statfilter; if(role==='admin'){adminStatusFilter = adminStatusFilter===v?null:v;} else {memberStatusFilter = memberStatusFilter===v?null:v;} render();
   });
-  const clearStat = $('#clearStatFilter'); if(clearStat) clearStat.onclick=()=>{memberStatusFilter=null; render();};
+  const clearStat = $('#clearStatFilter'); if(clearStat) clearStat.onclick=()=>{memberStatusFilter=null; adminStatusFilter=null; render();};
+  const aS = $('#adminSearchInput'); if(aS) aS.oninput=()=>{adminSearch=aS.value; render(); const x=$('#adminSearchInput'); x.focus(); x.setSelectionRange(x.value.length,x.value.length);};
+  const aC = $('#adminCatSelect'); if(aC) aC.onchange=()=>{adminCatFilter=aC.value; render();};
   const searchIn = $('#memberSearchInput'); if(searchIn) searchIn.oninput=()=>{memberSearch=searchIn.value; render(); searchIn.focus(); searchIn.setSelectionRange(searchIn.value.length,searchIn.value.length);};
   const catSel = $('#memberCatSelect'); if(catSel) catSel.onchange=()=>{memberCatFilter=catSel.value; render();};
 
   // ticket actions
   const bp=$('#btnProgress'); if(bp) bp.onclick=()=>{
-    const t=tickets.find(x=>x.id===openTicketId); t.status='In Progress'; addLog(t,'Marked In Progress',memberName(loggedInMemberId)); toast('Ticket marked In Progress'); render();
+    const t=tickets.find(x=>x.id===openTicketId); t.status='In Progress'; addLog(t,'Marked In Progress',actorName()); toast('Ticket marked In Progress'); render();
   };
   const ba=$('#btnApprove'); if(ba) ba.onclick=()=>{
     const t=tickets.find(x=>x.id===openTicketId); t.status='Approved'; t.resolvedAt=new Date().toISOString().slice(0,16).replace('T',' ');
     const note = t.docCategory ? `Re-upload enabled for ${t.docCategory}` : 'Approval action completed';
-    addLog(t,'Approved',memberName(loggedInMemberId),note); toast('Ticket approved, client notified'); render();
+    addLog(t,'Approved',actorName(),note); toast('Ticket approved, client notified'); render();
   };
   const br=$('#btnReject'); if(br) br.onclick=()=>{
     showModal(`<h3>Reject Ticket</h3>
@@ -445,7 +490,7 @@ function wireEvents(){
     $('#mSave').onclick=()=>{
       const r=$('#mRemarks').value.trim(); if(!r) return toast('Remarks are mandatory');
       const t=tickets.find(x=>x.id===openTicketId); t.status='Rejected'; t.remarks=r; t.resolvedAt=new Date().toISOString().slice(0,16).replace('T',' ');
-      addLog(t,'Rejected',memberName(loggedInMemberId),r); closeModal(); toast('Ticket rejected, client notified'); render();
+      addLog(t,'Rejected',actorName(),r); closeModal(); toast('Ticket rejected, client notified'); render();
     };
   };
 }
