@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>IoT Sandbox – Device Details (Document Lock & Update)</title>
+<style>
+:root{box-sizing:border-box;--bg:#f1f5f9;--card:#fff;--ink:#0f172a;--mut:#64748b;--line:#e2e8f0;--navy:#0f1f3d;--acc:#12305e;--ok:#15803d;--okbg:#dcfce7;--warn:#b45309;--warnbg:#fef3c7;--blue:#1d4ed8;--bluebg:#dbeafe;--pane:#f8fafc;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+*{box-sizing:border-box}html{height:100%}body{margin:0;font:14px/1.4 Inter,system-ui,sans-serif;background:var(--bg);color:var(--ink);display:flex;min-height:100%}
+aside{width:220px;background:var(--navy);color:#cbd5e1;padding:18px 12px;flex-shrink:0}
+aside b{color:#fff;font-family:Georgia,serif;font-size:16px;display:block;padding:0 8px 16px}
+aside a{display:block;padding:9px 10px;border-radius:8px;font-size:13px}aside a.on{background:#1e3a66;color:#fff;font-weight:600}
+main{flex:1;min-width:0}
+header{background:var(--card);padding:14px 28px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--line)}
+header h2{margin:0;font-family:Georgia,serif;font-size:22px}header small{color:var(--mut);letter-spacing:.08em;font-size:10px}
+.wrap{padding:20px 28px}.back{color:var(--mut);font-size:13px}h1{margin:6px 0 16px;font-size:24px}
+.grid{display:grid;grid-template-columns:220px 1fr;gap:20px}
+.dl{border-left:3px solid var(--navy);background:var(--card);padding:10px 12px;border-radius:0 8px 8px 0}.dl small{color:var(--mut);display:block}
+.panel{background:var(--card);border-radius:10px;overflow:hidden;box-shadow:0 1px 3px #0001}
+.ban{background:var(--navy);color:#fff;padding:18px 24px}.ban h3{margin:0 0 6px;font-size:24px}.ban code{background:#ffffff26;border-radius:99px;padding:3px 12px;font-size:12px}
+.sec{padding:18px 24px}.sec h4{margin:0 0 12px;font-size:12px;letter-spacing:.08em}
+.specs{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}.specs small{color:var(--mut);display:block}.specs span{font-weight:500}
+.box{border:1px solid var(--line);border-radius:10px;background:var(--pane);padding:18px;margin:0 24px 20px}
+.bh{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:12px}
+.bh b{font-size:15px}.pill{font-size:11px;background:var(--bluebg);color:var(--blue);padding:2px 9px;border-radius:99px;margin-left:8px;font-weight:600}
+.sub{color:var(--mut);font-size:13px;margin-top:2px}
+.row{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:12px 14px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.row.en{border-color:#22c55e;box-shadow:0 0 0 3px #22c55e22}.row.rq{border-color:#f59e0b}
+.nm{display:flex;align-items:center;gap:8px;font-weight:600}.fn{color:var(--mut);font-weight:400;font-size:13px;margin-top:3px;display:flex;gap:6px;align-items:center}
+.ver{font-size:10px;background:var(--line);border-radius:4px;padding:1px 6px;color:var(--mut);font-weight:600}
+.ic{width:18px;height:18px;flex-shrink:0}.lk{color:var(--mut)}.ul{color:var(--ok)}.lkw{color:var(--warn)}
+.st{font-size:11px;padding:2px 9px;border-radius:99px;font-weight:600}.st.w{background:var(--warnbg);color:var(--warn)}.st.g{background:var(--okbg);color:var(--ok)}
+.act{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+button{font:inherit;font-size:12.5px;padding:6px 12px;border-radius:6px;border:1px solid var(--line);background:var(--card);color:var(--ink);cursor:pointer;font-weight:600}
+button.p{background:var(--navy);color:#fff;border-color:var(--navy)}button.g{background:var(--ok);color:#fff;border-color:var(--ok)}button:disabled{opacity:.55;cursor:not-allowed}
+.proto{font-size:11px;color:var(--mut);border:1px dashed var(--mut);background:none;font-weight:500}
+.leg{display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:var(--mut);margin-bottom:12px}
+.leg span{display:flex;align-items:center;gap:5px}
+.modal{position:fixed;inset:0;background:#0009;display:none;align-items:center;justify-content:center;padding:16px;z-index:9}.modal.on{display:flex}
+.mb{background:var(--card);border-radius:12px;padding:22px;max-width:440px;width:100%}.mb h3{margin:0 0 6px}
+textarea{width:100%;min-height:80px;border:1px solid var(--line);border-radius:8px;padding:8px;font:inherit;background:var(--pane);color:var(--ink);margin:10px 0}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--navy);color:#fff;padding:10px 18px;border-radius:8px;display:none;z-index:10;font-size:13px;max-width:90%}
+@media(max-width:820px){aside{display:none}.grid{grid-template-columns:1fr}.wrap{padding:14px}.box{margin:0 12px 16px}.sec{padding:14px}}
+</style></head><body>
+<aside><b>IoT Sandbox</b><a>Dashboard</a><a>Services</a><a class="on">Device Details</a><a>Custom Tests</a><a>Payment</a><a>Test Status</a><a>Order Status</a><a>Notifications</a><a>Settings</a></aside>
+<main>
+<header><div><h2>Dashboard</h2><small>CLIENT / DASHBOARD</small></div><b>Dinesh</b></header>
+<div class="wrap">
+<div class="back">← Back</div><h1>My Registered Devices</h1>
+<div class="grid">
+<div><b>Device List</b><div class="dl" style="margin-top:12px"><b>TempControl Pro TC-45000</b><small>Industrial Controller</small></div></div>
+<div class="panel">
+<div class="ban"><h3>TempControl Pro TC-45000</h3><code>9241626d-b64b-440b-bb65-3371e09e7dd1</code></div>
+<div class="sec"><h4>TECHNICAL SPECIFICATIONS</h4><div class="specs">
+<div><small>Serial Number</small><span>AGST321sdfgs</span></div><div><small>MCU / Processor</small><span>W3 PROsdfg</span></div><div><small>Manufacturer</small><span>Renesas Electronicssdf</span></div><div><small>Device Type</small><span>Industrial Controllerdf</span></div></div></div>
+
+<div class="box"><div class="bh"><div><b>DEVICE DOCUMENTS</b><span class="pill" id="upc"></span><div class="sub">Uploaded documents are locked. Raise an update request to modify one.</div></div><button class="p">+ Add More Documents</button></div>
+<div class="leg"><span><svg class="ic lk"><use href="#lock"/></svg>Locked</span><span><svg class="ic lkw"><use href="#lock"/></svg>Update requested</span><span><svg class="ic ul"><use href="#unlock"/></svg>Update enabled</span></div>
+<div id="up"></div></div>
+
+<div class="box"><div class="bh"><div><b>PENDING DOCUMENTS</b><span class="pill" id="pnc"></span><div class="sub">Not uploaded yet – no lock applies. Upload as needed for future services.</div></div></div><div id="pn"></div></div>
+</div></div></div></main>
+
+<svg width="0" height="0" style="position:absolute"><defs>
+<symbol id="lock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 018 0v4"/></symbol>
+<symbol id="unlock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 017.5-2"/></symbol>
+</defs></svg>
+
+<div class="modal" id="m"><div class="mb"><h3>Request for update</h3><div class="sub" id="mt"></div><textarea id="rs" placeholder="Reason for update (e.g. revised firmware, corrected datasheet)"></textarea><div class="act" style="justify-content:flex-end"><button onclick="cl()">Cancel</button><button class="p" onclick="sub()">Raise ticket</button></div></div></div>
+<div class="toast" id="t"></div><input type="file" id="f" hidden>
+
+<script>
+// state: L=locked, R=update requested (ticket open), E=update enabled by Support, N=not uploaded
+var docs=[
+{id:'D101',n:'User Manual',f:'Datasheet-1.pdf',v:1,s:'L',u:'12 Sep 2026'},
+{id:'D102',n:'Technical Specification',f:'Datasheet-2.pdf',v:1,s:'L',u:'12 Sep 2026'},
+{id:'D103',n:'Device Datasheet',f:'v2_UART_PTQ.pdf',v:1,s:'L',u:'15 Sep 2026'},
+{id:'D104',n:'Firmware Document',f:'Datasheet-2.pdf',v:1,s:'L',u:'18 Sep 2026'}].concat(
+['Hardware Specification','Functional Documents','Drawing','Test Plan','Pin Configuration','Register Map','Evaluation Board','Programming Guide-API Documentation','Known Errata','Additional Supporting Documents'].map(function(n,i){return {id:'D2'+(i+10),n:n,s:'N',v:0}}));
+var tk=1040,cur=null,pick=null;
+function $(i){return document.getElementById(i)}
+function ico(c,u){return '<svg class="ic '+c+'"><use href="#'+u+'"/></svg>'}
+function toast(x){var t=$('t');t.textContent=x;t.style.display='block';clearTimeout(t.h);t.h=setTimeout(function(){t.style.display='none'},3200)}
+var TODAY='29 Sep 2026';
+function dt(d){return d.v>1?'Updated on '+d.up:'Uploaded on '+d.u}
+function row(d){
+ if(d.s==='N')return '<div class="row"><div class="nm">'+d.n+'</div><button onclick="pickFile(\''+d.id+'\',\'up\')">⬆ Upload</button></div>';
+ var lock=d.s==='E'?ico('ul','unlock'):ico(d.s==='R'?'lkw':'lk','lock'), cls=d.s==='E'?' en':d.s==='R'?' rq':'', b='';
+ if(d.s==='L')b='<button onclick="ask(\''+d.id+'\')">Request for update</button>';
+ if(d.s==='R')b='<span class="st w">Ticket '+d.t+' · awaiting Support approval</span><button disabled>Request sent</button><button class="proto" onclick="approve(\''+d.id+'\')" title="Prototype only">Simulate: Support enables</button>';
+ if(d.s==='E')b='<span class="st g">Update enabled</span><button class="g" onclick="pickFile(\''+d.id+'\',\'upd\')">⬆ Update file</button>';
+ return '<div class="row'+cls+'"><div><div class="nm">'+lock+d.n+'<span class="ver">v'+d.v+'</span></div><div class="fn">📄 '+d.f+'</div><div class="fn">🗓 '+dt(d)+(d.v>1?' · first uploaded '+d.u:'')+'</div></div><div class="act"><button>👁 View</button>'+b+'</div></div>'}
+function draw(){
+ var u=docs.filter(function(d){return d.s!=='N'}),p=docs.filter(function(d){return d.s==='N'});
+ $('up').innerHTML=u.map(row).join('');$('pn').innerHTML=p.map(row).join('');
+ $('upc').textContent='Uploaded ('+u.length+')';$('pnc').textContent='Upload Pending ('+p.length+')'}
+function g(id){return docs.filter(function(d){return d.id===id})[0]}
+function ask(id){cur=id;$('mt').textContent=g(id).n+' · creates a Support ticket (Device Document Updation)';$('rs').value='';$('m').classList.add('on')}
+function cl(){$('m').classList.remove('on')}
+function sub(){var d=g(cur);d.s='R';d.t='#T-'+(++tk);cl();draw();toast('Ticket '+d.t+' raised. You will be notified once Support enables the update.')}
+function approve(id){var d=g(id);d.s='E';draw();toast('Support approved '+d.t+' – lock opened for '+d.n)}
+function pickFile(id,mode){pick={id:id,mode:mode};$('f').value='';$('f').click()}
+$('f').onchange=function(){var x=this.files[0];if(!x)return;var d=g(pick.id);
+ d.f=x.name;
+ if(pick.mode==='upd'){d.v++;d.up=TODAY;d.s='L';delete d.t;toast('New version v'+d.v+' saved. Document locked again.')}
+ else{d.v=1;d.u=TODAY;d.s='L';toast(d.n+' uploaded and locked.')}
+ draw()};
+draw();
+</script></body></html>
