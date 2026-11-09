@@ -16,7 +16,7 @@ a:focus-visible,button:focus-visible,select:focus-visible,h1:focus-visible{outli
 .tools{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
 .tools button,.tools select{min-height:44px;min-width:44px;background:#fff;color:#000;border:1px solid #000;border-radius:4px;font:inherit;font-weight:700;cursor:pointer;padding:0 10px}
 .tools .hc{background:#000;color:#fff;border-color:#fff}
-.app{display:grid;grid-template-columns:272px 1fr;min-height:100vh}
+.app{display:grid;grid-template-columns:232px minmax(0,1fr);max-width:1180px;margin:0 auto;align-items:start;min-height:70vh}
 aside.side{background:var(--navy);color:#fff;padding:16px 12px;position:sticky;top:0;align-self:start;height:100vh;overflow:auto}
 .brand{display:flex;align-items:center;gap:10px;padding:4px 8px 16px;border-bottom:1px solid #ffffff55;margin-bottom:12px;color:#fff;text-decoration:none}
 .brand b{display:block}.brand small{opacity:.9}
@@ -29,7 +29,7 @@ aside.side{background:var(--navy);color:#fff;padding:16px 12px;position:sticky;t
 .side ul ul a{min-height:44px;font-size:.95rem}
 .side .sub:focus-visible,.side a:focus-visible{outline-color:#ffbf47}
 .content{min-width:0}
-.bar{background:#fff;border-bottom:1px solid var(--line);display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;padding:10px max(20px,calc((100% - 1180px)/2))}
+.bar{background:#fff;border-bottom:1px solid var(--line);display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;padding:10px 20px}
 .bar .r{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
 .meity{height:40px;width:auto;max-width:100%}
 #menu{display:none;min-height:44px;padding:0 14px;border:2px solid var(--navy);background:#fff;color:var(--navy);font:inherit;font-weight:700;border-radius:4px}
@@ -37,7 +37,7 @@ aside.side{background:var(--navy);color:#fff;padding:16px 12px;position:sticky;t
 .bell span.n{margin-left:8px;background:var(--red);color:#fff;border-radius:12px;padding:0 8px;font-size:.85rem}
 .btn{display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:6px 18px;border-radius:4px;font:inherit;font-weight:700;text-decoration:none;border:2px solid var(--blue);background:var(--blue);color:#fff;cursor:pointer}
 .btn.alt{background:#fff;color:var(--blue)}
-main{padding:16px 20px 32px;max-width:1180px;margin:0 auto}
+main{padding:16px 20px 32px}
 .crumb ol{list-style:none;display:flex;flex-wrap:wrap;gap:6px;margin:0 0 8px;padding:0;font-size:.9rem}
 .crumb li+li:before{content:"/";margin-right:6px;color:var(--muted)}
 h1{font-size:1.8rem;color:var(--navy);margin:4px 0}
@@ -56,7 +56,8 @@ section{margin-top:28px}
 .tw{overflow-x:auto}
 table{width:100%;border-collapse:collapse;background:#fff}
 caption{text-align:left;position:absolute;left:-9999px}
-th,td{padding:12px 14px;border-bottom:1px solid var(--line);text-align:left;vertical-align:middle}
+td .btn{white-space:nowrap;padding:6px 14px}
+th,td{padding:12px 10px;border-bottom:1px solid var(--line);text-align:left;vertical-align:middle}
 thead th{background:var(--navy);color:#fff;font-size:.85rem;text-transform:uppercase;letter-spacing:.04em}
 .badge{display:inline-block;border:2px solid currentColor;border-radius:14px;padding:1px 10px;font-weight:700;font-size:.85rem;white-space:nowrap}
 .b-prog{color:var(--blue)}.b-act{color:var(--amber)}.b-done{color:var(--green)}.b-ship{color:var(--muted)}
@@ -127,10 +128,11 @@ td:before{content:attr(data-label);font-weight:700;color:var(--navy);flex:none}
 <tbody id="rows"></tbody></table></div>
 <p class="muted" style="font-size:.9rem">Sample data shown for design review.</p></section>
 </main>
+
+</div></div>
 <footer><p style="margin:0 0 6px"><b>Web Information Manager:</b> [Name, Designation], C-DAC Bengaluru | <b>Last updated:</b> <time datetime="2026-11-09">9 November 2026</time> | Content owned and maintained by C-DAC Bengaluru.</p>
 <p style="margin:0">© 2026 C-DAC Bengaluru. IoT Security Ecosystem &amp; Sandbox. Ministry of Electronics &amp; IT, Government of India.</p>
 <nav aria-label="Website policies"><a href="#policies">Website Policies</a> · <a href="#terms">Terms &amp; Conditions</a> · <a href="#privacy">Privacy Policy</a> · <a href="#accessibility">Accessibility Statement</a> · <a href="#sr-help">Help</a></nav></footer>
-</div></div>
 <script>
 (function(){
 var d=[
