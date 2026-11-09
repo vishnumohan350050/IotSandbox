@@ -100,7 +100,47 @@ textarea{min-height:150px;resize:vertical}
 .flt select{width:auto;min-width:200px}
 
 @media(max-width:900px){.two{grid-template-columns:1fr}}
-.sr{position:absolute;left:-9999px}</style></head><body>
+.sr{position:absolute;left:-9999px}.rh{display:flex;flex-wrap:wrap;gap:12px 20px;align-items:center;justify-content:space-between}
+.rh .id{display:flex;gap:14px;align-items:center;flex-wrap:wrap}
+.ico{width:56px;height:56px;border-radius:12px;background:#e3edff;display:grid;place-items:center;font-size:1.6rem;color:var(--navy);flex:none}
+.meta{display:grid;gap:10px 24px;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));margin:14px 0 0;padding:14px 0 0;border-top:1px solid var(--line)}
+.meta dt{font-size:.85rem;color:var(--muted)}.meta dd{margin:0;font-weight:700}
+.tabs{display:flex;gap:2px;border-bottom:2px solid var(--line);overflow-x:auto;margin-top:20px}
+.tabs button{min-height:48px;padding:0 18px;border:0;border-bottom:5px solid transparent;background:none;font:inherit;font-weight:600;color:var(--muted);cursor:pointer;white-space:nowrap}
+.tabs button[aria-selected="true"]{color:var(--navy);border-bottom-color:var(--blue)}
+.tabs button:hover{background:#e3edff}
+.panel{padding-top:20px}
+.split{display:grid;gap:20px;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr);align-items:start}
+.msgs{list-style:none;margin:0;padding:0;max-height:460px;overflow:auto}
+.cm{display:flex;gap:12px;margin-bottom:16px}
+.av{flex:none;width:40px;height:40px;border-radius:50%;display:grid;place-items:center;font-weight:700;border:2px solid var(--navy);background:#fff;color:var(--navy)}
+.bub{flex:1;border:1px solid var(--line);border-radius:10px;padding:10px 14px;background:#eef3ff}
+.cm.c .bub{background:#eaf6ec}
+.who{margin:0 0 4px;display:flex;flex-wrap:wrap;gap:4px 12px;justify-content:space-between}
+.who time{color:var(--muted);font-size:.85rem}
+.att{display:flex;gap:10px;align-items:center;border:1px solid var(--line);background:#fff;border-radius:6px;padding:8px 12px;margin-top:8px}
+.rfi{background:#eef3ff;border:2px solid var(--blue);border-radius:8px;padding:16px;margin-bottom:20px}
+.ok{background:#eaf6ec;border:2px solid var(--green);border-radius:8px;padding:14px 16px;margin-top:20px}
+.dl{list-style:none;margin:0;padding:0}
+.dl li{display:flex;gap:10px;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--line)}
+.dl li:last-child{border:0}
+.dl-b{white-space:nowrap;padding:6px 12px}
+.dl li{flex-wrap:wrap}
+.ov{display:grid;gap:10px 28px;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));margin:0}
+.ov dt{font-size:.85rem;color:var(--muted)}.ov dd{margin:0 0 8px;font-weight:700}
+.comp{display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap;margin-top:16px;border-top:1px solid var(--line);padding-top:16px}
+.comp .g{flex:1;min-width:200px}
+label.fl{font-weight:700;color:var(--navy);display:block;margin-bottom:4px}
+textarea,select.f,input.f{width:100%;font:inherit;padding:10px 12px;border:2px solid #4a5568;border-radius:6px;background:#fff;color:#000;min-height:44px}
+textarea{resize:vertical;min-height:70px}
+.filebtn{display:inline-flex;align-items:center;min-height:44px;padding:0 14px;border:2px solid var(--blue);border-radius:4px;color:var(--blue);font-weight:700;cursor:pointer;background:#fff}
+.filebtn:focus-within{outline:3px solid #ffbf47;box-shadow:0 0 0 5px #000}
+.filebtn input{position:absolute;opacity:0;width:1px;height:1px}
+.note2{padding:10px 14px;border-left:6px solid var(--green);background:#fff;margin:12px 0;font-weight:600}
+.note2.err{border-left-color:var(--red);color:var(--red)}
+@media(max-width:900px){.split{grid-template-columns:1fr}}
+
+</style></head><body>
 <a class="skip" href="#main">Skip to main content</a><div class="tri" aria-hidden="true"></div>
 <div class="top"><div><span>An initiative under the Ministry of Electronics &amp; IT, Government of India</span>
 <div class="tools" role="group" aria-label="Accessibility tools"><a href="#main">Skip to main content</a><a href="#sr-help">Screen Reader Access</a>
@@ -141,10 +181,20 @@ textarea{min-height:150px;resize:vertical}
 </div>
 
 <div id="v-req" hidden>
-<nav aria-label="Breadcrumb" class="crumb"><ol><li><a href="#">Tester Dashboard</a></li><li><a href="#assigned-tasks">Service Request</a></li><li><span aria-current="page">Request more information</span></li></ol></nav>
-<h1 id="h-req" tabindex="-1">Request more information</h1>
-<div class="info" id="info"></div>
-<div id="fmsg" role="alert"></div>
+<nav aria-label="Breadcrumb" class="crumb"><ol><li><a href="#">Tester Dashboard</a></li><li><a href="#assigned-tasks">Service Request</a></li><li><span aria-current="page" id="bc">Request</span></li></ol></nav>
+<div class="card" id="rq-head"></div>
+<div class="tabs" role="tablist" aria-label="Service request sections" id="tabs">
+<button type="button" role="tab" id="tab-overview" aria-controls="p-overview" aria-selected="true">Overview</button>
+<button type="button" role="tab" id="tab-request" aria-controls="p-request" aria-selected="false" tabindex="-1">Request More Info</button>
+<button type="button" role="tab" id="tab-documents" aria-controls="p-documents" aria-selected="false" tabindex="-1">Documents</button>
+<button type="button" role="tab" id="tab-history" aria-controls="p-history" aria-selected="false" tabindex="-1">Status History</button></div>
+<div id="fmsg"></div>
+
+<div class="panel" role="tabpanel" id="p-overview" aria-labelledby="tab-overview" tabindex="0">
+<section class="card" aria-labelledby="ovh"><h2 id="ovh">Request overview</h2><dl class="ov" id="ov"></dl></section></div>
+
+<div class="panel" role="tabpanel" id="p-request" aria-labelledby="tab-request" tabindex="0" hidden>
+<div class="ok" id="resp" role="status" hidden style="margin:0 0 20px"><b>The client has responded.</b> Review the shared documents, then request more information or mark the review complete.</div>
 <div class="two">
 <div>
 <fieldset><legend>Request additional documents (select one or more categories)</legend><div id="cats"></div></fieldset>
@@ -155,11 +205,22 @@ textarea{min-height:150px;resize:vertical}
 <div>
 <label for="msg">Message to client</label>
 <textarea id="msg" placeholder="Write the message the client will see"></textarea>
-<h2 class="h4" style="margin-top:20px;font-size:1.05rem">Conversation history</h2>
-<ul class="hist card" id="hist" style="padding:10px 16px"></ul>
 </div></div>
-<div class="actions" style="display:flex;flex-wrap:wrap;gap:12px;margin:24px 0 8px"><button type="button" class="btn" id="send">Send request to client</button><button type="button" class="btn alt" id="done">Mark review complete</button><a class="btn alt" href="#assigned-tasks">Back to assigned tasks</a></div>
+<section class="card" style="margin-top:20px" aria-labelledby="chh"><h2 id="chh" style="margin-bottom:12px">Communication history</h2>
+<div role="region" aria-label="Messages, scrollable" tabindex="0"><ol class="msgs" id="msgs"></ol></div></section>
+<div style="display:flex;flex-wrap:wrap;gap:12px;margin:24px 0 8px"><button type="button" class="btn" id="send">Send request to client</button><button type="button" class="btn alt" id="done">Mark review complete</button></div>
 <p class="muted">The request is shown on the client’s service request page. Status becomes “Info Requested” until the client responds.</p>
+</div>
+
+<div class="panel" role="tabpanel" id="p-documents" aria-labelledby="tab-documents" tabindex="0" hidden>
+<section class="card" aria-labelledby="dh"><h2 id="dh">Documents</h2>
+<div class="tw"><table><caption>Documents shared on this service request</caption><thead><tr><th scope="col">Document</th><th scope="col">Category</th><th scope="col">Size</th><th scope="col">Uploaded on</th><th scope="col">Uploaded by</th><th scope="col">Action</th></tr></thead><tbody id="drows"></tbody></table></div>
+<p id="dnone" class="muted" hidden>No documents have been shared yet. Documents requested from the client appear here once uploaded.</p></section></div>
+
+<div class="panel" role="tabpanel" id="p-history" aria-labelledby="tab-history" tabindex="0" hidden>
+<section class="card" aria-labelledby="sh2"><h2 id="sh2">Status history</h2>
+<div class="tw"><table><caption>Status changes for this service request, newest first</caption><thead><tr><th scope="col">Date and time</th><th scope="col">Status</th><th scope="col">Updated by</th><th scope="col">Remarks</th></tr></thead><tbody id="hrows"></tbody></table></div></section></div>
+<p style="margin-top:20px"><a class="btn alt" href="#assigned-tasks">← Back to assigned tasks</a></p>
 </div>
 </main></div></div>
 <footer><p style="margin:0 0 6px"><b>Web Information Manager:</b> [Name, Designation], C-DAC Bengaluru | <b>Last updated:</b> <time datetime="2026-11-09">9 November 2026</time> | Content owned and maintained by C-DAC Bengaluru.</p>
@@ -168,61 +229,79 @@ textarea{min-height:150px;resize:vertical}
 <script>
 (function(){
 var $=function(i){return document.getElementById(i)};
+var MON=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+function stamp(){var d=new Date(),H=d.getHours(),m=('0'+d.getMinutes()).slice(-2);return ('0'+d.getDate()).slice(-2)+' '+MON[d.getMonth()]+' '+d.getFullYear()+' \u00B7 '+('0'+(H%12||12)).slice(-2)+':'+m+' '+(H<12?'AM':'PM')}
+var ME="Dinesh1 (Tester)";
+var CLS={"Assigned":["b-ship","\u25CB "],"In Progress":["b-prog","\u25CF "],"Under Review":["b-rev","\u25C6 "],"Info Requested":["b-act","\u25B2 "],"Review Complete":["b-done","\u2713 "],"Completed":["b-done","\u2713 "],"Submitted":["b-ship","\u25CB "]};
+function badge(s){var c=CLS[s]||CLS.Submitted;return '<span class="badge '+c[0]+'">'+c[1]+s+'</span>'}
+function SH(t,s,b,r){return [t,s,b,r]}
 var D=[
-{id:"SR-2026-000123",dev:"Smart Door Lock SL-100",cl:"Acme Devices Pvt Ltd",svc:"Security Sandbox",sub:"Consumer IoT",st:"Under Review",up:"9 Nov 2026, 10:30",h:[["6 Nov","Tester","requested documents"],["7 Nov","Client","uploaded Security Architecture Document"],["7 Nov","Client","clarified OTA signing"]]},
-{id:"SR-2026-000121",dev:"Industrial Gateway IG-10",cl:"Nova Controls Ltd",svc:"Security Sandbox",sub:"Industrial Control",st:"In Progress",up:"8 Nov 2026, 16:45",h:[]},
-{id:"SR-2026-000118",dev:"Smart Energy Meter SM-200",cl:"GridWorks India",svc:"Functionality Sandbox",sub:"Protocol Testing",st:"Assigned",up:"8 Nov 2026, 11:10",h:[]},
-{id:"SR-2026-000115",dev:"Wearable Monitor WM-3",cl:"MediTrack Systems",svc:"Security Sandbox",sub:"Medical Devices",st:"Info Requested",up:"7 Nov 2026, 15:20",h:[["7 Nov","Tester","requested documents"]]},
-{id:"SR-2026-000109",dev:"Telematics Unit TU-4",cl:"AutoLink Pvt Ltd",svc:"Functionality Sandbox",sub:"EMI / EMC Testing",st:"Assigned",up:"7 Nov 2026, 09:05",h:[]},
-{id:"SR-2026-000102",dev:"Smart Lock SL-7",cl:"SecureHome Tech",svc:"Security Sandbox",sub:"Consumer IoT",st:"Completed",up:"5 Nov 2026, 17:00",h:[]}];
-var CLS={"Assigned":["b-ship","\u25CB "],"In Progress":["b-prog","\u25CF "],"Under Review":["b-rev","\u25C6 "],"Info Requested":["b-act","\u25B2 "],"Review Complete":["b-done","\u2713 "],"Completed":["b-done","\u2713 "]};
-function badge(s){var c=CLS[s];return '<span class="badge '+c[0]+'">'+c[1]+s+'</span>'}
-var CATS=["Test Report (previous)","Security Architecture Document","Data Sheet","User Manual","Firmware Update Procedure","Threat Model","Compliance Certificates"],cur=null,fv='';
+{id:"SR-2026-000123",dev:"Smart Door Lock SL-100",cl:"Acme Devices Pvt Ltd",svc:"Security Sandbox",sub:"Consumer IoT",st:"Info Requested",sb:"04 Nov 2026 \u00B7 10:15 AM",up:"05 Nov 2026 \u00B7 04:20 PM",
+msgs:[{w:ME,r:"t",i:"D1",t:"05 Nov 2026 \u00B7 02:30 PM",x:"Please share the security architecture document and provide test report. Also clarify the OTA update signing mechanism (questionnaire item 1)."},{w:"Client (Acme Devices)",r:"c",i:"CU",t:"05 Nov 2026 \u00B7 03:15 PM",x:"Sure, we are working on the requested documents. We will upload them shortly."},{w:ME,r:"t",i:"D1",t:"05 Nov 2026 \u00B7 03:45 PM",x:"Thanks. Please also share the compliance certificates for this product."},{w:"Client (Acme Devices)",r:"c",i:"CU",t:"05 Nov 2026 \u00B7 04:20 PM",x:"Here are the requested documents.",a:"Compliance_Certificates.pdf (245 KB)"}],
+docs:[{n:"Compliance_Certificates.pdf",c:"Compliance Certificates",s:"245 KB",t:"05 Nov 2026, 04:20 PM",b:"Client"},{n:"Test_Report.pdf",c:"Test Report (Previous)",s:"1.2 MB",t:"05 Nov 2026, 04:18 PM",b:"Client"}],
+h:[SH("05 Nov 2026 \u00B7 02:30 PM","Info Requested",ME,"Test report and security architecture document requested"),SH("05 Nov 2026 \u00B7 09:30 AM","Under Review",ME,"Review started"),SH("04 Nov 2026 \u00B7 11:00 AM","Assigned","System","Assigned to Dinesh1, C-DAC Hyderabad"),SH("04 Nov 2026 \u00B7 10:15 AM","Submitted","Client","Service request submitted")]},
+{id:"SR-2026-000121",dev:"Industrial Gateway IG-10",cl:"Nova Controls Ltd",svc:"Security Sandbox",sub:"Industrial Control",st:"In Progress",sb:"06 Nov 2026 \u00B7 10:00 AM",up:"08 Nov 2026 \u00B7 04:45 PM",msgs:[],docs:[],h:[SH("08 Nov 2026 \u00B7 04:45 PM","In Progress",ME,"Testing started"),SH("07 Nov 2026 \u00B7 09:10 AM","Assigned","System","Assigned to Dinesh1, C-DAC Hyderabad"),SH("06 Nov 2026 \u00B7 10:00 AM","Submitted","Client","Service request submitted")]},
+{id:"SR-2026-000118",dev:"Smart Energy Meter SM-200",cl:"GridWorks India",svc:"Functionality Sandbox",sub:"Protocol Testing",st:"Assigned",sb:"07 Nov 2026 \u00B7 10:40 AM",up:"08 Nov 2026 \u00B7 11:10 AM",msgs:[],docs:[],h:[SH("08 Nov 2026 \u00B7 11:10 AM","Assigned","System","Assigned to Dinesh1, C-DAC Hyderabad"),SH("07 Nov 2026 \u00B7 10:40 AM","Submitted","Client","Service request submitted")]},
+{id:"SR-2026-000115",dev:"Wearable Monitor WM-3",cl:"MediTrack Systems",svc:"Security Sandbox",sub:"Medical Devices",st:"Under Review",sb:"05 Nov 2026 \u00B7 01:00 PM",up:"07 Nov 2026 \u00B7 03:20 PM",msgs:[],docs:[],h:[SH("07 Nov 2026 \u00B7 03:20 PM","Under Review",ME,"Review started"),SH("06 Nov 2026 \u00B7 09:00 AM","Assigned","System","Assigned to Dinesh1, C-DAC Hyderabad"),SH("05 Nov 2026 \u00B7 01:00 PM","Submitted","Client","Service request submitted")]},
+{id:"SR-2026-000109",dev:"Telematics Unit TU-4",cl:"AutoLink Pvt Ltd",svc:"Functionality Sandbox",sub:"EMI / EMC Testing",st:"Assigned",sb:"06 Nov 2026 \u00B7 02:30 PM",up:"07 Nov 2026 \u00B7 09:05 AM",msgs:[],docs:[],h:[SH("07 Nov 2026 \u00B7 09:05 AM","Assigned","System","Assigned to Dinesh1, C-DAC Hyderabad"),SH("06 Nov 2026 \u00B7 02:30 PM","Submitted","Client","Service request submitted")]},
+{id:"SR-2026-000102",dev:"Smart Lock SL-7",cl:"SecureHome Tech",svc:"Security Sandbox",sub:"Consumer IoT",st:"Completed",sb:"20 Oct 2026 \u00B7 10:30 AM",up:"05 Nov 2026 \u00B7 05:00 PM",msgs:[],docs:[],h:[SH("05 Nov 2026 \u00B7 05:00 PM","Completed","System","Request closed"),SH("21 Oct 2026 \u00B7 09:00 AM","Assigned","System","Assigned to Dinesh1, C-DAC Hyderabad"),SH("20 Oct 2026 \u00B7 10:30 AM","Submitted","Client","Service request submitted")]}];
+var CATS=["Test Report (Previous)","Security Architecture Document","Data Sheet","User Manual","Firmware Update Procedure","Threat Model","Compliance Certificates"],cur=null,fv='';
 function count(s){return D.filter(function(r){return r.st===s}).length}
-function stats(){
-var a=[["All assigned tasks",D.length],["Assigned",count("Assigned")],["In progress",count("In Progress")],["Under review",count("Under Review")],["Info requested",count("Info Requested")],["Completed",count("Completed")+count("Review Complete")]],h='';
-a.forEach(function(x){h+='<div class="card stat" role="listitem"><b>'+x[1]+'</b>'+x[0]+'</div>'});
-$('stats').innerHTML=h;$('pend').textContent=count("Assigned")}
-function rows(){
-var h='',n=0;
-D.forEach(function(r){if(fv&&r.st!==fv)return;n++;
-h+='<tr><td data-label="Service request ID"><b>'+r.id+'</b></td><td data-label="Device details">'+r.dev+'<br><span class="muted">Client: '+r.cl+'</span></td><td data-label="Test service">'+r.svc+'<br><span class="muted">'+r.sub+'</span></td><td data-label="Status">'+badge(r.st)+'</td><td data-label="Updated">'+r.up+'</td><td data-label="Action"><a class="btn alt" href="#request-'+r.id+'">View<span class="sr"> '+r.id+'</span></a></td></tr>'});
-$('rows').innerHTML=h;$('none').hidden=n>0}
 function find(id){return D.filter(function(r){return r.id===id})[0]}
-function info(){$('info').innerHTML='<span><b>'+cur.id+'</b></span><span>'+cur.dev+'</span><span>Client: '+cur.cl+'</span><span>Test: '+cur.svc+', '+cur.sub+'</span><span>Status: '+badge(cur.st)+'</span>'}
-function hist(){var h='';if(!cur.h.length)h='<li>No messages yet.</li>';cur.h.forEach(function(x){h+='<li><b>'+x[0]+'</b> '+x[1]+': '+x[2]+'</li>'});$('hist').innerHTML=h}
-function cats(chk){var h='';CATS.forEach(function(c,i){h+='<div class="chk"><input type="checkbox" id="c'+i+'" value="'+c+'"'+((chk&&chk.indexOf(c)>-1)?' checked':'')+'><label for="c'+i+'">'+c+'</label></div>'});$('cats').innerHTML=h}
-function note(t,err){$('fmsg').innerHTML='<p class="msg'+(err?' err':'')+'">'+t+'</p>';$('live').textContent=t}
-function now(){var d=new Date(),m=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];return d.getDate()+' '+m[d.getMonth()]+' '+d.getFullYear()+', '+('0'+d.getHours()).slice(-2)+':'+('0'+d.getMinutes()).slice(-2)}
-function today(){var d=new Date(),m=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];return d.getDate()+' '+m[d.getMonth()]}
-$('send').onclick=function(){
-var sel=[].slice.call(document.querySelectorAll('#cats input:checked')).map(function(e){return e.value}),m=$('msg').value.trim();
-if(!sel.length&&!m){note('Select at least one document category or write a message before sending.',1);return}
-cur.h.push([today(),"Tester","requested "+(sel.length?sel.join(', '):'information')+(m?'. Message: '+m:'')]);
-cur.st="Info Requested";cur.up=now();info();hist();stats();rows();cats();$('msg').value='';note('Request sent to client. Status is now Info Requested.')};
-$('done').onclick=function(){cur.st="Review Complete";cur.up=now();info();stats();rows();note('Review marked complete.')};
+function stats(){var a=[["All assigned tasks",D.length],["Assigned",count("Assigned")],["In progress",count("In Progress")],["Under review",count("Under Review")],["Info requested",count("Info Requested")],["Completed",count("Completed")+count("Review Complete")]],h='';
+a.forEach(function(x){h+='<div class="card stat" role="listitem"><b>'+x[1]+'</b>'+x[0]+'</div>'});$('stats').innerHTML=h;$('pend').textContent=count("Assigned")}
+function rows(){var h='',n=0;D.forEach(function(r){if(fv&&r.st!==fv)return;n++;
+h+='<tr><td data-label="Service request ID"><b>'+r.id+'</b></td><td data-label="Device details">'+esc(r.dev)+'<br><span class="muted">Client: '+esc(r.cl)+'</span></td><td data-label="Test service">'+r.svc+'<br><span class="muted">'+r.sub+'</span></td><td data-label="Status">'+badge(r.st)+'</td><td data-label="Updated">'+r.up.replace(' \u00B7 ',', ')+'</td><td data-label="Action"><a class="btn alt" href="#request-'+r.id+'">View<span class="sr"> '+r.id+'</span></a></td></tr>'});
+$('rows').innerHTML=h;$('none').hidden=n>0}
+var tabs=['overview','request','documents','history'];
+function note(t,err){$('fmsg').innerHTML='<p class="note2'+(err?' err':'')+'">'+esc(t)+'</p>';$('live').textContent=t}
+function sel(k,f){tabs.forEach(function(x){var on=x===k,b=$('tab-'+x);b.setAttribute('aria-selected',String(on));b.tabIndex=on?0:-1;$('p-'+x).hidden=!on;if(on&&f)b.focus()})}
+function head(){var r=cur;$('rq-head').innerHTML='<div class="rh"><div class="id"><span class="ico" aria-hidden="true">\u25A3</span><div><h1 id="h-req" tabindex="-1" style="margin:0">'+r.id+'</h1><p style="margin:0">'+esc(r.dev)+'</p></div>'+badge(r.st)+'</div></div><dl class="meta"><div><dt>Client</dt><dd>'+esc(r.cl)+'</dd></div><div><dt>Submitted on</dt><dd>'+r.sb+'</dd></div><div><dt>Last updated</dt><dd>'+r.up+'</dd></div></dl>'}
+function ov(){var r=cur;$('ov').innerHTML=[["Service request ID",r.id],["Device",esc(r.dev)],["Client",esc(r.cl)],["Test service",r.svc],["Domain / test type",r.sub],["Current status",badge(r.st)],["Submitted on",r.sb],["Last updated",r.up],["Assigned tester","Dinesh1 (C-DAC Hyderabad)"]].map(function(x){return '<div><dt>'+x[0]+'</dt><dd>'+x[1]+'</dd></div>'}).join('')}
+function msgs(){var r=cur,h='';if(!r.msgs.length)h='<li class="muted">No messages yet.</li>';
+r.msgs.forEach(function(m){h+='<li class="cm '+m.r+'"><span class="av" aria-hidden="true">'+m.i+'</span><div class="bub"><p class="who"><b>'+esc(m.w)+'</b><time>'+m.t+'</time></p><p style="margin:0">'+esc(m.x)+'</p>'+(m.a?'<div class="att"><span aria-hidden="true">\uD83D\uDCC4</span>'+esc(m.a)+'</div>':'')+'</div></li>'});
+$('msgs').innerHTML=h;var b=$('msgs').parentNode;b.scrollTop=b.scrollHeight;
+var l=r.msgs[r.msgs.length-1];$('resp').hidden=!(r.st==='Info Requested'&&l&&l.r==='c')}
+function docs(){var r=cur,b='';r.docs.forEach(function(d){b+='<tr><td data-label="Document"><b>'+esc(d.n)+'</b></td><td data-label="Category">'+esc(d.c)+'</td><td data-label="Size">'+d.s+'</td><td data-label="Uploaded on">'+d.t+'</td><td data-label="Uploaded by">'+d.b+'</td><td data-label="Action"><button type="button" class="btn alt dl-b" data-n="'+esc(d.n)+'">Download<span class="sr"> '+esc(d.n)+'</span></button></td></tr>'});
+$('drows').innerHTML=b;$('dnone').hidden=r.docs.length>0;$('tab-documents').textContent='Documents ('+r.docs.length+')'}
+function hist(){$('hrows').innerHTML=cur.h.map(function(x){return '<tr><td data-label="Date and time">'+x[0]+'</td><td data-label="Status">'+badge(x[1])+'</td><td data-label="Updated by">'+esc(x[2])+'</td><td data-label="Remarks">'+esc(x[3])+'</td></tr>'}).join('')}
+function cats(chk){var h='';CATS.forEach(function(c,i){h+='<div class="chk"><input type="checkbox" id="c'+i+'" value="'+esc(c)+'"'+((chk&&chk.indexOf(c)>-1)?' checked':'')+'><label for="c'+i+'">'+esc(c)+'</label></div>'});$('cats').innerHTML=h}
+function chosen(){return [].slice.call(document.querySelectorAll('#cats input:checked')).map(function(e){return e.value})}
+function all(){head();ov();msgs();docs();hist();cats()}
+$('send').onclick=function(){var sel2=chosen(),m=$('msg').value.trim();
+if(!sel2.length&&!m){note('Select at least one document category or write a message before sending.',1);return}
+var x=(sel2.length?'Requested: '+sel2.join(', ')+'. ':'')+m;
+cur.msgs.push({w:ME,r:"t",i:"D1",t:stamp(),x:x.trim()});cur.st="Info Requested";cur.up=stamp();
+cur.h.unshift([cur.up,"Info Requested",ME,sel2.length?'Requested '+sel2.join(', '):'Information requested']);
+$('msg').value='';all();rows();stats();note('Request sent to client. Status is now Info Requested.')};
+$('done').onclick=function(){cur.st="Review Complete";cur.up=stamp();cur.h.unshift([cur.up,"Review Complete",ME,"Review marked complete"]);all();rows();stats();note('Review marked complete.')};
 $('addc').onclick=function(){var o=$('newcat').hidden;$('newcat').hidden=!o;$('addc').setAttribute('aria-expanded',String(o));if(o)$('ncn').focus()};
 $('ncs').onclick=function(){var v=$('ncn').value.trim();
 if(!v){note('Enter a name for the new category.',1);$('ncn').focus();return}
 if(CATS.some(function(c){return c.toLowerCase()===v.toLowerCase()})){note('That category already exists.',1);return}
-var sel=[].slice.call(document.querySelectorAll('#cats input:checked')).map(function(e){return e.value});
-CATS.push(v);sel.push(v);cats(sel);$('ncn').value='';$('newcat').hidden=true;$('addc').setAttribute('aria-expanded','false');note('Category “'+v+'” added to the master device-category list and selected.')};
+var s=chosen();CATS.push(v);s.push(v);cats(s);$('ncn').value='';$('newcat').hidden=true;$('addc').setAttribute('aria-expanded','false');note('Category \u201C'+v+'\u201D added to the master device-category list and selected.')};
+document.addEventListener('click',function(e){var b=e.target.closest&&e.target.closest('.dl-b');if(b)note('Download is not available in this design preview ('+b.getAttribute('data-n')+').')});
+$('tabs').addEventListener('click',function(e){var b=e.target.closest('[role=tab]');if(b)sel(b.id.slice(4),false)});
+$('tabs').addEventListener('keydown',function(e){var i=tabs.indexOf(document.activeElement.id.slice(4)),n=-1;
+if(e.key==='ArrowRight')n=(i+1)%4;else if(e.key==='ArrowLeft')n=(i+3)%4;else if(e.key==='Home')n=0;else if(e.key==='End')n=3;
+if(n>-1){e.preventDefault();sel(tabs[n],true)}});
 $('flt').onchange=function(){fv=this.value;rows()};
 var first=true;
 function route(){
 var id=location.hash.slice(1),m=id.match(/^request-(SR-\d{4}-\d{6})$/),k='dash',h;
-if(m&&find(m[1])){cur=find(m[1]);$('v-dash').hidden=true;$('v-req').hidden=false;info();hist();cats();$('msg').value='';$('fmsg').innerHTML='';h=$('h-req');k='assigned-tasks';document.title='Request more information – Tester – IoT Sandbox';window.scrollTo(0,0)}
-else{$('v-req').hidden=true;$('v-dash').hidden=false;h=$('h-dash');document.title='Tester Dashboard – IoT Sandbox';
+if(m&&find(m[1])){cur=find(m[1]);$('v-dash').hidden=true;$('v-req').hidden=false;$('fmsg').innerHTML='';all();sel('overview',false);$('bc').textContent=cur.id;h=$('h-req');k='assigned-tasks';document.title=cur.id+' \u2013 Tester \u2013 IoT Sandbox';window.scrollTo(0,0)}
+else{$('v-req').hidden=true;$('v-dash').hidden=false;h=$('h-dash');document.title='Tester Dashboard \u2013 IoT Sandbox';
 if(id==='pending-tests'){fv='Assigned';k='assigned-tasks'}else if(id==='completed-tasks'){fv='Completed';k='completed-tasks'}else if(id==='assigned-tasks'){fv='';k='assigned-tasks'}
 $('flt').value=fv;rows();
 if(k!=='dash'||id==='tasks'){$('tasks').scrollIntoView()}else window.scrollTo(0,0)}
 [].forEach.call(document.querySelectorAll('#mnav a'),function(a){if(a.getAttribute('data-k')===k)a.setAttribute('aria-current','page');else a.removeAttribute('aria-current')});
 if(!first&&h){h.setAttribute('tabindex','-1');h.focus({preventScroll:true})}first=false}
 window.addEventListener('hashchange',route);stats();rows();route();
-var r=document.documentElement,s=100;
-function set(v){s=Math.max(80,Math.min(140,v));r.style.setProperty('--fs',s+'%')}
+var r0=document.documentElement,s=100;
+function set(v){s=Math.max(80,Math.min(140,v));r0.style.setProperty('--fs',s+'%')}
 $('inc').onclick=function(){set(s+10)};$('dec').onclick=function(){set(s-10)};$('reset').onclick=function(){set(100)};
-$('hc').onclick=function(){var on=r.getAttribute('data-contrast')==='high';if(on)r.removeAttribute('data-contrast');else r.setAttribute('data-contrast','high');this.setAttribute('aria-pressed',String(!on))};
+$('hc').onclick=function(){var on=r0.getAttribute('data-contrast')==='high';if(on)r0.removeAttribute('data-contrast');else r0.setAttribute('data-contrast','high');this.setAttribute('aria-pressed',String(!on))};
 $('menu').onclick=function(){var o=$('side').classList.toggle('open');this.setAttribute('aria-expanded',String(o))};
 })();
 </script></body></html>
