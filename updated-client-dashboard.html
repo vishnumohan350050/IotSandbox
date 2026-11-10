@@ -140,6 +140,14 @@ footer address{font-style:normal}
 .fl{list-style:none;margin:0;padding:0}
 .fl a{display:inline-block;padding:5px 0}
 .fcols>div{text-align:left!important}
+
+.b-gen{color:#5b21b6}.stepper{display:flex;flex-wrap:wrap;gap:8px;list-style:none;padding:0;margin:0 0 16px}
+.stepper li{border:2px solid var(--line);border-radius:20px;padding:4px 14px;font-weight:600;background:#fff}
+.stepper li.done{border-color:var(--green);color:var(--green)}.stepper li.now{border-color:var(--navy);background:var(--navy);color:#fff}
+.num{text-align:right}.tot{max-width:340px;margin-left:auto}.tot div{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--line)}
+.tot .g{font-weight:700;font-size:1.1rem;border:0}.inv{border:2px solid var(--navy);border-radius:8px;padding:18px;background:#fff}
+.pdfdoc{background:#fff;border:2px solid #000;padding:24px;max-width:860px}
+@media print{body *{visibility:hidden}#pdfdoc,#pdfdoc *{visibility:visible}#pdfdoc{position:absolute;left:0;top:0;width:100%;border:0}}
 </style></head><body>
 <a class="skip" href="#main">Skip to main content</a><div class="tri" aria-hidden="true"></div>
 <div class="top"><div><span>An initiative under the Ministry of Electronics &amp; IT, Government of India</span>
@@ -195,6 +203,7 @@ footer address{font-style:normal}
 <div class="card" id="rq-head"></div>
 <div class="tabs" role="tablist" aria-label="Service request sections" id="tabs">
 <button type="button" role="tab" id="tab-overview" aria-controls="p-overview" aria-selected="true">Overview</button>
+<button type="button" role="tab" id="tab-quote" aria-controls="p-quote" aria-selected="false" tabindex="-1">Quotation &amp; Invoice</button>
 <button type="button" role="tab" id="tab-communication" aria-controls="p-communication" aria-selected="false" tabindex="-1">Communication</button>
 <button type="button" role="tab" id="tab-documents" aria-controls="p-documents" aria-selected="false" tabindex="-1">Documents</button>
 <button type="button" role="tab" id="tab-history" aria-controls="p-history" aria-selected="false" tabindex="-1">Status History</button></div>
@@ -202,6 +211,8 @@ footer address{font-style:normal}
 
 <div class="panel" role="tabpanel" id="p-overview" aria-labelledby="tab-overview" tabindex="0">
 <section class="card" aria-labelledby="ovh"><h2 id="ovh">Request overview</h2><dl class="ov" id="ov"></dl></section></div>
+
+<div class="panel" role="tabpanel" id="p-quote" aria-labelledby="tab-quote" tabindex="0" hidden><div id="qbox"></div></div>
 
 <div class="panel" role="tabpanel" id="p-communication" aria-labelledby="tab-communication" tabindex="0" hidden>
 <div class="split">
@@ -230,6 +241,7 @@ footer address{font-style:normal}
 <div class="panel" role="tabpanel" id="p-history" aria-labelledby="tab-history" tabindex="0" hidden>
 <section class="card" aria-labelledby="sh2"><h2 id="sh2">Status history</h2>
 <div class="tw"><table><caption>Status changes for this service request, newest first</caption><thead><tr><th scope="col">Date and time</th><th scope="col">Status</th><th scope="col">Updated by</th><th scope="col">Remarks</th></tr></thead><tbody id="hrows"></tbody></table></div></section></div>
+<section class="card" id="pdfv" hidden aria-labelledby="pdfh" style="margin-top:20px"><h2 id="pdfh">PDF preview</h2><div class="pdfdoc" id="pdfdoc"></div><div style="display:flex;flex-wrap:wrap;gap:12px;margin-top:14px"><button type="button" class="btn" id="pdfsave">Download PDF</button><button type="button" class="btn alt" id="pdfprint">Print / Save as PDF</button><button type="button" class="btn alt" id="pdfclose">Close preview</button></div></section>
 <p style="margin-top:20px"><a class="btn alt" href="#service-requests">← Back to dashboard</a></p>
 </div>
 </main>
@@ -240,6 +252,7 @@ footer address{font-style:normal}
 <div><h2 class="fh">Web Information Manager</h2><p>[Name, Designation], C-DAC Bengaluru</p><p><b>Last updated:</b> <time datetime="2026-11-09">9 November 2026</time><br>Content owned and maintained by C-DAC Bengaluru.</p></div>
 <div><h2 class="fh">IoT Sandbox</h2><p>© 2026 C-DAC Bengaluru. IoT Security Ecosystem &amp; Sandbox.<br>Ministry of Electronics &amp; IT, Government of India.</p><p>Follow us: <a href="#x" target="_blank" rel="noopener">X<span style="position:absolute;left:-9999px"> (opens in a new tab, external site)</span> ↗</a> &nbsp; <a href="#li" target="_blank" rel="noopener">LinkedIn<span style="position:absolute;left:-9999px"> (opens in a new tab, external site)</span> ↗</a></p></div>
 <nav aria-label="Website policies"><h2 class="fh">Website policies</h2><ul class="fl"><li><a href="#policies">Website Policies</a></li><li><a href="#terms">Terms &amp; Conditions</a></li><li><a href="#privacy">Privacy Policy</a></li><li><a href="#copyright">Copyright Policy</a></li><li><a href="#hyperlink">Hyperlinking Policy</a></li><li><a href="#accessibility">Accessibility Statement</a></li><li><a href="#sitemap">Sitemap</a></li><li><a href="#sr-help">Help</a></li></ul></nav></div></footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script>
 (function(){
 var $=function(i){return document.getElementById(i)};
@@ -266,7 +279,7 @@ $('c-all').textContent=R.length;
 $('c-prog').textContent=R.filter(function(r){return P.indexOf(r.st)>-1}).length;
 $('c-act').textContent=R.filter(function(r){return r.st==='Info Requested'}).length;
 $('c-done').textContent=R.filter(function(r){return r.st==='Report Ready'||r.st==='Completed'}).length}
-var cur=null,tabs=['overview','communication','documents','history'];
+var cur=null,tabs=['overview','quote','communication','documents','history'];
 function note(t,err){$('fmsg').innerHTML='<p class="note2'+(err?' err':'')+'">'+esc(t)+'</p>';$('live').textContent=t}
 function sel(k,f){tabs.forEach(function(x){var on=x===k,b=$('tab-'+x);b.setAttribute('aria-selected',String(on));b.tabIndex=on?0:-1;$('p-'+x).hidden=!on;if(on&&f)b.focus()})}
 function head(){var r=cur;$('rq-head').innerHTML='<div class="rh"><div class="id"><span class="ico" aria-hidden="true">\u25A3</span><div><h1 id="h-req" tabindex="-1" style="margin:0">'+r.id+'</h1><p style="margin:0">'+esc(r.dev)+'</p></div>'+badge(r.st)+'</div></div><dl class="meta"><div><dt>Submitted on</dt><dd>'+r.sb+'</dd></div><div><dt>Last updated</dt><dd>'+r.up+'</dd></div><div><dt>Tester</dt><dd>'+esc(r.tester)+'</dd></div></dl>'}
@@ -282,7 +295,7 @@ r.docs.forEach(function(d){a+='<li><span><b>'+esc(d.n)+'</b><br><span class="mut
 b+='<tr><td data-label="Document"><b>'+esc(d.n)+'</b></td><td data-label="Category">'+esc(d.c)+'</td><td data-label="Size">'+d.s+'</td><td data-label="Uploaded on">'+d.t+'</td><td data-label="Uploaded by">'+d.b+'</td><td data-label="Action"><button type="button" class="btn alt dl-b" data-n="'+esc(d.n)+'">Download<span class="sr"> '+esc(d.n)+'</span></button></td></tr>'});
 $('mdocs').innerHTML=a||'<li class="muted">No documents yet.</li>';$('drows').innerHTML=b;$('dnone').hidden=r.docs.length>0;$('tab-documents').textContent='Documents ('+r.docs.length+')'}
 function hist(){$('hrows').innerHTML=cur.h.map(function(x){return '<tr><td data-label="Date and time">'+x[0]+'</td><td data-label="Status">'+badge(x[1])+'</td><td data-label="Updated by">'+esc(x[2])+'</td><td data-label="Remarks">'+esc(x[3])+'</td></tr>'}).join('')}
-function all(){head();ov();msgs();docs();hist();$('ucat').innerHTML=CATS.map(function(c){return '<option>'+esc(c)+'</option>'}).join('')}
+function all(){head();ov();quote();msgs();docs();hist();$('pdfv').hidden=true;$('ucat').innerHTML=CATS.map(function(c){return '<option>'+esc(c)+'</option>'}).join('')}
 function okfile(f){if(f.size>20*1048576){note('The file is larger than 20 MB. Choose a smaller file.',1);return false}return true}
 function addDoc(f,cat){var t=stamp().replace(' \u00B7 ',', ');cur.docs.push({n:f.name,c:cat,s:sz(f.size),t:t,b:"Client"});cur.up=stamp()}
 $('cf').onsubmit=function(e){e.preventDefault();var t=$('mt').value.trim(),f=$('mf').files[0];
@@ -300,8 +313,50 @@ $('ufile').value='';all();note('Document uploaded and shared with the tester.')}
 document.addEventListener('click',function(e){var b=e.target.closest&&e.target.closest('.dl-b');if(b)note('Download is not available in this design preview ('+b.getAttribute('data-n')+').')});
 $('tabs').addEventListener('click',function(e){var b=e.target.closest('[role=tab]');if(b)sel(b.id.slice(4),false)});
 $('tabs').addEventListener('keydown',function(e){var i=tabs.indexOf(document.activeElement.id.slice(4)),n=-1;
-if(e.key==='ArrowRight')n=(i+1)%4;else if(e.key==='ArrowLeft')n=(i+3)%4;else if(e.key==='Home')n=0;else if(e.key==='End')n=3;
+if(e.key==='ArrowRight')n=(i+1)%tabs.length;else if(e.key==='ArrowLeft')n=(i+tabs.length-1)%tabs.length;else if(e.key==='Home')n=0;else if(e.key==='End')n=tabs.length-1;
 if(n>-1){e.preventDefault();sel(tabs[n],true)}});
+var GST=0.18;
+function money(n){return '\u20B9'+Number(n).toLocaleString('en-IN')}
+function rs(n){return 'Rs. '+Number(n).toLocaleString('en-IN')}
+function calc(l){var s=0;l.forEach(function(x){s+=x.q*x.p});var g=Math.round(s*GST);return {s:s,g:g,t:s+g}}
+var curPdf=null;
+function pdfb(t,l,s){var x=s?'<span class="sr"> '+s+'</span>':'',p=l?l+' ':'';return '<button type="button" class="btn alt pdf-v" data-t="'+t+'">View '+p+'PDF'+x+'</button> <button type="button" class="btn alt pdf-d" data-t="'+t+'">Download '+p+'PDF'+x+'</button>'}
+function hdoc(x){var q=cur.q;if(x[1]==='Draft Quotation')return pdfb('draft','',' draft quotation');if(x[1]==='Quotation Generated'&&q.state!=='draft')return pdfb('quotation','',' quotation');if(x[1]==='Invoice Generated'&&q.state==='paid')return pdfb('invoice','',' invoice');return '\u2013'}
+function trows(L){return L.map(function(l){return '<tr><td data-label="Service">'+esc(l.s)+'</td><td data-label="Qty" class="num">'+l.q+'</td><td data-label="Unit price" class="num">'+money(l.p)+'</td><td data-label="Amount" class="num">'+money(l.q*l.p)+'</td></tr>'}).join('')}
+function tot(L){var c=calc(L);return '<div class="tot"><div><span>Subtotal</span><span>'+money(c.s)+'</span></div><div><span>GST (18%, sample rate)</span><span>'+money(c.g)+'</span></div><div class="g"><span>Total</span><span>'+money(c.t)+'</span></div></div>'}
+function changes(q){var o=q.orig||[],out=[];q.lines.forEach(function(l){var m=o.filter(function(x){return x.s===l.s})[0];if(!m)out.push('Added: '+l.s);else if(m.p!==l.p||m.q!==l.q)out.push('Updated: '+l.s+' (was '+m.q+' \u00D7 '+money(m.p)+', now '+l.q+' \u00D7 '+money(l.p)+')')});o.forEach(function(x){if(!q.lines.some(function(l){return l.s===x.s}))out.push('Removed: '+x.s)});return out}
+function quote(){var r=cur;if(!r.q)r.q={state:'draft',no:null,date:null,lines:[{s:'Security Assessment – Consumer IoT (ETSI EN 303 645)',q:1,p:60000},{s:'Vulnerability scan of companion mobile app',q:1,p:25000},{s:'Retest after fixes',q:2,p:10000}],orig:[{s:'Security Assessment – Consumer IoT (ETSI EN 303 645)',q:1,p:60000},{s:'Vulnerability scan of companion mobile app',q:1,p:25000},{s:'Retest after fixes',q:2,p:10000}]};var q=r.q,i=q.state==='draft'?0:q.state==='generated'?1:3,L=['Draft quotation','Quotation generated','Payment','Invoice generated'],h='';
+h+='<ol class="stepper" aria-label="Quotation progress">'+L.map(function(x,k){return '<li class="'+(k<i?'done':k===i?'now':'')+'"'+(k===i?' aria-current="step"':'')+'>'+(k<i?'\u2713 ':'')+x+'</li>'}).join('')+'</ol>';
+var tbl=function(l,c){return '<div class="tw"><table><caption>'+c+'</caption><thead><tr><th scope="col">Service</th><th scope="col">Qty</th><th scope="col">Unit price</th><th scope="col">Amount</th></tr></thead><tbody>'+trows(l)+'</tbody></table></div>'};
+if(q.state==='draft'){h+='<section class="card" aria-labelledby="qh"><h2 id="qh">Draft quotation</h2><p class="muted" style="margin:4px 0 12px">This draft was created from the services you selected. It has been sent to the administrator for review. The administrator may change the quantity or price of specific services before approving it. You will be notified when the final quotation is ready for payment.</p>'+tbl(q.lines,'Draft quotation line items')+'<div style="margin-top:16px">'+tot(q.lines)+'</div><p style="margin:16px 0 0">'+pdfb('draft','draft quotation')+'</p></section>'}
+else{var ch=changes(q);
+h+='<section class="card" aria-labelledby="qh"><h2 id="qh">Quotation '+esc(q.no)+'</h2><p class="muted" style="margin:4px 0 12px">Approved by the administrator on '+q.date+'.</p>'+tbl(q.lines,'Quotation line items')+'<div style="margin-top:16px">'+tot(q.lines)+'</div><p style="margin:16px 0 0">'+pdfb('quotation','quotation')+'</p></section>';
+if(ch.length)h+='<section class="card" style="margin-top:20px" aria-labelledby="chh2"><h2 id="chh2" style="font-size:1.15rem">Changes made by the administrator to your draft</h2><ul style="margin:8px 0 0 20px;padding:0">'+ch.map(function(c){return '<li>'+esc(c)+'</li>'}).join('')+'</ul></section>';
+if(q.state==='generated')h+='<section class="card" style="margin-top:20px" aria-labelledby="ph"><h2 id="ph">Payment</h2><p>Status: <span class="badge b-act">\u25B2 Payment pending</span> Amount due: <b>'+money(calc(q.lines).t)+'</b></p><p class="muted">Your invoice is generated after payment.</p><p><button type="button" class="btn" id="cpay">Pay now (preview only)</button></p></section>';
+else h+='<section class="card" style="margin-top:20px" aria-labelledby="ph"><h2 id="ph">Payment and invoice</h2><p>Payment: <span class="badge b-done">\u2713 Received</span> Reference '+esc(q.pay.ref)+' on '+q.pay.date+'.</p><div class="inv" style="margin-top:12px"><h3>Invoice '+esc(q.inv.no)+'</h3><p style="margin:4px 0">Invoice date: <b>'+q.inv.date+'</b> &nbsp; Amount paid (incl. GST): <b>'+money(calc(q.lines).t)+'</b></p><p style="margin:8px 0 0">'+pdfb('invoice','invoice')+'</p></div></section>'}
+$('qbox').innerHTML=h}
+function docInfo(r,t){var q=r.q,lines=t==='draft'?q.orig:q.lines,title=t==='draft'?'Draft Quotation':t==='quotation'?'Quotation':'Tax Invoice',no=t==='draft'?'Draft for '+r.id:t==='quotation'?q.no:q.inv.no,date=t==='draft'?dshort(r.sb):t==='quotation'?q.date:q.inv.date,nt=t==='draft'?'This is the draft prepared from the services you selected. It is not final until approved by the administrator.':t==='quotation'?'Approved by the administrator on '+q.date+'. Payment is due before testing can proceed.':'Payment received. Reference '+q.pay.ref+' on '+q.pay.date+'.';return {title:title,no:no,date:date,note:nt,lines:lines,c:calc(lines)}}
+function pdfShow(t){var r=cur,d=docInfo(r,t);curPdf={r:r,t:t};
+$('pdfdoc').innerHTML='<p class="tag">C-DAC Bengaluru \u00B7 IoT Security Ecosystem &amp; Sandbox</p><h2 style="margin:0 0 6px">'+d.title+'</h2><p style="margin:0 0 12px"><b>No:</b> '+esc(d.no)+' &nbsp; <b>Date:</b> '+d.date+'</p><dl class="ov"><div><dt>Service request</dt><dd>'+r.id+'</dd></div><div><dt>Device</dt><dd>'+esc(r.dev)+'</dd></div><div><dt>Test service</dt><dd>'+r.svc+', '+r.sub+'</dd></div></dl><div class="tw"><table><caption>'+d.title+' line items</caption><thead><tr><th scope="col">Service</th><th scope="col">Qty</th><th scope="col">Unit price</th><th scope="col">Amount</th></tr></thead><tbody>'+trows(d.lines)+'</tbody></table></div><div style="margin-top:12px">'+tot(d.lines)+'</div><p style="margin:12px 0 0">'+esc(d.note)+'</p><p class="muted" style="margin:6px 0 0;font-size:.9rem">Sample document for design review.</p>';
+$('pdfh').textContent=d.title+' preview';$('pdfv').hidden=false;$('pdfv').scrollIntoView();$('pdfh').setAttribute('tabindex','-1');$('pdfh').focus({preventScroll:true});$('live').textContent=d.title+' preview opened'}
+function pdfSave(){if(!curPdf)return;var d=docInfo(curPdf.r,curPdf.t);
+if(!window.jspdf){note('The PDF library could not be loaded here. Use Print / Save as PDF instead.',1);return}
+try{var P=new window.jspdf.jsPDF({unit:'mm',format:'a4'}),y=18;
+P.setFontSize(10);P.text('C-DAC Bengaluru - IoT Security Ecosystem & Sandbox',15,y);y+=10;P.setFontSize(18);P.text(d.title,15,y);y+=8;P.setFontSize(10);
+P.text('No: '+d.no+'     Date: '+d.date,15,y);y+=6;P.text('Service request: '+curPdf.r.id,15,y);y+=6;P.text('Device: '+curPdf.r.dev,15,y);y+=6;P.text('Test service: '+curPdf.r.svc+', '+curPdf.r.sub,15,y);y+=10;
+P.setFont('helvetica','bold');P.text('Service',15,y);P.text('Qty',120,y,{align:'right'});P.text('Unit price',155,y,{align:'right'});P.text('Amount',195,y,{align:'right'});P.setFont('helvetica','normal');y+=2;P.line(15,y,195,y);y+=6;
+d.lines.forEach(function(l){var t=P.splitTextToSize(l.s,90);P.text(t,15,y);P.text(String(l.q),120,y,{align:'right'});P.text(rs(l.p),155,y,{align:'right'});P.text(rs(l.q*l.p),195,y,{align:'right'});y+=5*t.length+2});
+y+=2;P.line(15,y,195,y);y+=6;P.text('Subtotal',155,y,{align:'right'});P.text(rs(d.c.s),195,y,{align:'right'});y+=6;P.text('GST (18%, sample rate)',155,y,{align:'right'});P.text(rs(d.c.g),195,y,{align:'right'});y+=6;P.setFont('helvetica','bold');P.text('Total',155,y,{align:'right'});P.text(rs(d.c.t),195,y,{align:'right'});P.setFont('helvetica','normal');y+=10;
+P.text(P.splitTextToSize(d.note,180),15,y);y+=14;P.setFontSize(9);P.text('Sample document for design review.',15,y);
+P.save((d.no.replace(/[^A-Za-z0-9-]+/g,'_'))+'.pdf');note(d.title+' PDF download started. If nothing downloads, use Print / Save as PDF.')}catch(e){note('The PDF could not be saved here. Use Print / Save as PDF instead.',1)}}
+document.addEventListener('click',function(e){var b=e.target.closest&&e.target.closest('button');if(!b)return;
+if(b.classList.contains('pdf-v'))pdfShow(b.getAttribute('data-t'));
+else if(b.classList.contains('pdf-d')){pdfShow(b.getAttribute('data-t'));pdfSave()}
+else if(b.id==='pdfsave')pdfSave();
+else if(b.id==='pdfprint')window.print();
+else if(b.id==='pdfclose'){$('pdfv').hidden=true;$('live').textContent='Preview closed'}
+else if(b.id==='cpay'){var q=cur.q,d=dshort(stamp());q.state='paid';q.pay={ref:'PAY-'+cur.id.slice(-6),date:d};q.inv={no:'INV-2026-'+cur.id.slice(-6),date:d};cur.st=cur.tester&&cur.tester!=='Not yet assigned'?'Assigned to Tester':'Awaiting Tester Allocation';cur.up=stamp();
+cur.h.unshift([cur.up,cur.st,'System','Payment received']);cur.h.unshift([cur.up,'Invoice Generated','System','Invoice '+q.inv.no+' generated']);cur.h.unshift([cur.up,'Payment Received','You','Payment received']);dash();all();sel('quote',false);note('Payment received. Invoice '+q.inv.no+' generated.')}});
 var first=true;
 function route(){
 var id=location.hash.slice(1),m=id.match(/^request-(SR-\d{4}-\d{6})$/),k='dash',hd;
